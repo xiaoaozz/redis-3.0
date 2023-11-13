@@ -76,7 +76,7 @@ typedef long long mstime_t; /* millisecond time type. */
 #define REDIS_MAXIDLETIME       0       /* default client timeout: infinite */
 #define REDIS_DEFAULT_DBNUM     16
 #define REDIS_CONFIGLINE_MAX    1024
-#define REDIS_DBCRON_DBS_PER_CALL 16
+#define REDIS_DBCRON_DBS_PER_CALL 16   /* 默认的数据库个数 */
 #define REDIS_MAX_WRITE_PER_EVENT (1024*64)
 #define REDIS_SHARED_SELECT_CMDS 10
 #define REDIS_SHARED_INTEGERS 10000
