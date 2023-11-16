@@ -715,7 +715,7 @@ werr: /* Write error. */
     return REDIS_ERR;
 }
 
-/* Save the DB on disk. Return REDIS_ERR on error, REDIS_OK on success. */
+/* 对应save命令，保存DB到磁盘上，错误时返回REDIS_ERR，成功时返回REDIS_OK */
 int rdbSave(char *filename) {
     char tmpfile[256];
     FILE *fp;
@@ -736,13 +736,13 @@ int rdbSave(char *filename) {
         goto werr;
     }
 
-    /* Make sure data will not remain on the OS's output buffers */
+    /* 确保数据不会保留在操作系统的输出缓冲区中 */
     if (fflush(fp) == EOF) goto werr;
     if (fsync(fileno(fp)) == -1) goto werr;
     if (fclose(fp) == EOF) goto werr;
 
-    /* Use RENAME to make sure the DB file is changed atomically only
-     * if the generate DB file is ok. */
+    /* 使用RENAME确保只自动更改DB文件
+     * 如果生成的DB文件是正确的. */
     if (rename(tmpfile,filename) == -1) {
         redisLog(REDIS_WARNING,"Error moving temp DB file on the final destination: %s", strerror(errno));
         unlink(tmpfile);
@@ -760,7 +760,7 @@ werr:
     unlink(tmpfile);
     return REDIS_ERR;
 }
-
+/* 对应BGSAVE命令，fork一个子进程来调用rdbSave函数来创建RDB文件 */
 int rdbSaveBackground(char *filename) {
     pid_t childpid;
     long long start;
@@ -1126,6 +1126,7 @@ void rdbLoadProgressCallback(rio *r, const void *buf, size_t len) {
     }
 }
 
+/* RDB文件载入 */
 int rdbLoad(char *filename) {
     uint32_t dbid;
     int type, rdbver;

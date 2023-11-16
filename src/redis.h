@@ -579,9 +579,10 @@ typedef struct redisClient {
     char buf[REDIS_REPLY_CHUNK_BYTES];
 } redisClient;
 
+/* save选项条件 */
 struct saveparam {
-    time_t seconds;
-    int changes;
+    time_t seconds; // 秒数
+    int changes; // 修改数
 };
 
 struct sharedObjectsStruct {
@@ -787,16 +788,16 @@ struct redisServer {
     int aof_stop_sending_diff;     /* If true stop sending accumulated diffs
                                       to child process. */
     sds aof_child_diff;             /* AOF diff accumulator child side. */
-    /* RDB persistence */
-    long long dirty;                /* Changes to DB from the last save */
+    /* RDB持久化 */
+    long long dirty;                /* 修改计数器 */
     long long dirty_before_bgsave;  /* Used to restore dirty on failed BGSAVE */
     pid_t rdb_child_pid;            /* PID of RDB saving child */
-    struct saveparam *saveparams;   /* Save points array for RDB */
+    struct saveparam *saveparams;   /* 保存RDB条件数组 */
     int saveparamslen;              /* Number of saving points */
     char *rdb_filename;             /* Name of RDB file */
     int rdb_compression;            /* Use compression in RDB? */
     int rdb_checksum;               /* Use RDB checksum? */
-    time_t lastsave;                /* Unix time of last successful save */
+    time_t lastsave;                /* 上次成功保存的Unix时间 */
     time_t lastbgsave_try;          /* Unix time of last attempted bgsave */
     time_t rdb_save_time_last;      /* Time used by last RDB save run. */
     time_t rdb_save_time_start;     /* Current RDB save start time. */

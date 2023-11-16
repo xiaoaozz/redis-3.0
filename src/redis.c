@@ -1052,23 +1052,21 @@ void updateCachedTime(void) {
     server.mstime = mstime();
 }
 
-/* This is our timer interrupt, called server.hz times per second.
- * Here is where we do a number of things that need to be done asynchronously.
- * For instance:
+/* 这是我们的定时器中断, 每秒被唤醒server.hz次
+ * 这里是我们做一些需要异步完成的事情。
+ * 例如：
  *
- * - Active expired keys collection (it is also performed in a lazy way on
- *   lookup).
- * - Software watchdog.
- * - Update some statistic.
- * - Incremental rehashing of the DBs hash tables.
- * - Triggering BGSAVE / AOF rewrite, and handling of terminated children.
- * - Clients timeout of different kinds.
- * - Replication reconnection.
- * - Many more...
+ * - 激活过期key收集 (它也以惰性删除方式执行).
+ * - 软件看门狗.
+ * - 更新一些统计数据.
+ * - 增量重哈希数据库数据表.
+ * - 触发BGSAVE/AOF重写，并处理终止的子进程.
+ * - 客户端各种超时时间.
+ * - 复制重连.
+ * - 更多.
  *
- * Everything directly called here will be called server.hz times per second,
- * so in order to throttle execution of things we want to do less frequently
- * a macro is used: run_with_period(milliseconds) { .... }
+ * 这里直接调用的所有东西都将每秒被唤醒server.hz次，
+ * 因此为了限制我们想要做的事情的执行频率可以使用run_with_period(milliseconds) { .... }
  */
 
 int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
@@ -1189,15 +1187,17 @@ int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
             updateDictResizePolicy();
         }
     } else {
-        /* If there is not a background saving/rewrite in progress check if
-         * we have to save/rewrite now */
+        /* 
+            如果没有正在进行的后台保存或者重写，检查是否必须现在保存/重写
+         */
+         // 遍历所有保存条件
          for (j = 0; j < server.saveparamslen; j++) {
             struct saveparam *sp = server.saveparams+j;
 
-            /* Save if we reached the given amount of changes,
-             * the given amount of seconds, and if the latest bgsave was
-             * successful or if, in case of an error, at least
-             * REDIS_BGSAVE_RETRY_DELAY seconds already elapsed. */
+            /* 
+                如果到达了给定的更改量和秒数，并且最近的bgsave成功或者在发生错误的情况下，
+                至少已经经过了REDIS_BGSAVE_RETRY_DELAY指定的秒数，则进行保存。
+             */
             if (server.dirty >= sp->changes &&
                 server.unixtime-server.lastsave > sp->seconds &&
                 (server.unixtime-server.lastbgsave_try >
